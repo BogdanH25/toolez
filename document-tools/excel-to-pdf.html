@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Toolez - Excel to PDF</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; line-height: 1.5; min-height: 100vh; display: flex; flex-direction: column; }
+    a { text-decoration: none; color: inherit; }
+    .container { width: min(1200px, 92%); margin: 0 auto; }
+    header { position: sticky; top: 0; z-index: 100; background: rgba(10,10,10,0.95); border-bottom: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(10px); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 0; flex-wrap: wrap; }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-box { width: 42px; height: 42px; border-radius: 14px; background: #fff; color: #111; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
+    .logo-text h1 { font-size: 18px; }
+    .logo-text p { font-size: 12px; color: #aaa; }
+    nav { display: flex; gap: 22px; color: #cfcfcf; font-size: 14px; }
+    nav a:hover { color: #fff; }
+    .breadcrumb { padding: 18px 0 0; display: flex; align-items: center; gap: 8px; font-size: 14px; color: #666; flex-wrap: wrap; }
+    .breadcrumb a { color: #888; transition: color 0.2s; }
+    .breadcrumb a:hover { color: #fff; }
+    .breadcrumb span { color: #444; }
+    .breadcrumb strong { color: #d0d0d0; }
+    .page-title { padding: 16px 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .page-title-left { display: flex; align-items: center; gap: 14px; }
+    .tool-badge { width: 48px; height: 48px; border-radius: 14px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.25); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .page-title h2 { font-size: 26px; }
+    .page-title p { font-size: 14px; color: #888; margin-top: 3px; }
+    .back-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #cfcfcf; font-size: 14px; transition: 0.2s ease; }
+    .back-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .main { flex: 1; padding-bottom: 50px; }
+    .split-card { border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); border-radius: 28px; overflow: hidden; display: grid; grid-template-columns: 1fr 1px 1fr; min-height: 520px; }
+    .divider { background: rgba(255,255,255,0.07); }
+    .panel-left { padding: 32px 30px; display: flex; flex-direction: column; gap: 24px; }
+    .panel-label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: #555; text-transform: uppercase; margin-bottom: 4px; }
+    .panel-left h3 { font-size: 20px; color: #f0f0f0; }
+    .instructions { display: flex; flex-direction: column; gap: 14px; }
+    .step { display: flex; gap: 14px; align-items: flex-start; }
+    .step-num { width: 28px; height: 28px; border-radius: 9px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.25); color: #86efac; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .step-text strong { display: block; font-size: 14px; color: #e0e0e0; margin-bottom: 3px; }
+    .step-text span { font-size: 13px; color: #777; }
+    .info-box { background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.15); border-radius: 16px; padding: 16px 18px; }
+    .info-box p { font-size: 13px; color: #999; line-height: 1.6; }
+    .info-box p strong { color: #86efac; }
+    .supported { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .format-tag { padding: 5px 12px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); font-size: 12px; color: #aaa; }
+    .panel-right { padding: 32px 30px; display: flex; flex-direction: column; gap: 20px; }
+    .panel-right h3 { font-size: 20px; color: #f0f0f0; }
+    .upload-zone { border: 2px dashed rgba(255,255,255,0.1); border-radius: 20px; padding: 36px 24px; text-align: center; background: #090909; cursor: pointer; transition: border-color 0.25s ease, background 0.25s ease; position: relative; }
+    .upload-zone:hover { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.04); }
+    .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .upload-icon { font-size: 38px; margin-bottom: 10px; }
+    .upload-zone p { font-size: 15px; font-weight: 600; margin-bottom: 5px; }
+    .upload-zone small { font-size: 13px; color: #666; }
+    .notice-box { background: rgba(59,130,246,0.07); border: 1px solid rgba(59,130,246,0.2); border-radius: 16px; padding: 18px 20px; }
+    .notice-box h4 { font-size: 14px; color: #93c5fd; margin-bottom: 8px; }
+    .notice-box p { font-size: 13px; color: #6b7280; line-height: 1.65; }
+    .notice-box p + p { margin-top: 8px; }
+    .coming-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); font-size: 12px; color: #86efac; font-weight: 600; margin-top: 4px; }
+    .control-group { display: flex; flex-direction: column; gap: 6px; }
+    .control-group label { font-size: 13px; color: #888; }
+    .control-group input[type="text"] { background: #0d0d0d; border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 12px; padding: 11px 14px; font-size: 14px; outline: none; transition: border-color 0.2s; width: 100%; }
+    .control-group input:focus { border-color: rgba(34,197,94,0.45); }
+    .control-group input::placeholder { color: #444; }
+    .btn-primary { width: 100%; padding: 14px; border-radius: 16px; background: rgba(34,197,94,0.5); color: #fff; border: none; font-size: 15px; font-weight: 700; cursor: not-allowed; letter-spacing: 0.02em; opacity: 0.7; }
+    .status-msg { font-size: 13px; color: #666; text-align: center; padding: 4px 0; min-height: 22px; }
+    footer { border-top: 1px solid rgba(255,255,255,0.08); color: #888; padding: 22px 0 30px; font-size: 14px; }
+    @media (max-width: 860px) { .split-card { grid-template-columns: 1fr; } .divider { width: 100%; height: 1px; } }
+    @media (max-width: 600px) { .page-title h2 { font-size: 20px; } .panel-left, .panel-right { padding: 22px 18px; } }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-box">T</div>
+        <div class="logo-text"><h1>Toolez</h1><p>Everything you need. Nothing to pay.</p></div>
+      </a>
+      <nav><a href="index.html">Home</a><a href="#">Donate a coffee</a></nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a><span>/</span>
+        <a href="../document-tools.html">Document Tools</a><span>/</span>
+        <strong>Excel to PDF</strong>
+      </div>
+
+      <div class="page-title">
+        <div class="page-title-left">
+          <div class="tool-badge">📊</div>
+          <div>
+            <h2>Excel to PDF</h2>
+            <p>Convert Excel spreadsheets to PDF format</p>
+          </div>
+        </div>
+        <a href="../document-tools.html" class="back-btn">← Back to Document Tools</a>
+      </div>
+
+      <div class="split-card">
+
+        <!-- LEFT -->
+        <div class="panel-left">
+          <div>
+            <div class="panel-label">How it works</div>
+            <h3>Instructions</h3>
+          </div>
+          <div class="instructions">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-text">
+                <strong>Upload your Excel file</strong>
+                <span>Select a .xlsx or .xls spreadsheet from your device</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-text">
+                <strong>Choose output options</strong>
+                <span>Set your preferred page layout and output filename</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-text">
+                <strong>Convert and download</strong>
+                <span>Your spreadsheet is converted to PDF with all sheets preserved</span>
+              </div>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>What gets preserved?</strong> All sheets, cell values, basic formatting, borders, and merged cells. Charts and complex formulas are rendered as-is.</p>
+          </div>
+          <div>
+            <div class="panel-label" style="margin-bottom:10px;">Supported input formats</div>
+            <div class="supported">
+              <span class="format-tag">XLSX</span>
+              <span class="format-tag">XLS</span>
+              <span class="format-tag">CSV</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- RIGHT -->
+        <div class="panel-right">
+          <div>
+            <div class="panel-label">Tool</div>
+            <h3>Excel to PDF</h3>
+          </div>
+
+          <div class="upload-zone">
+            <input type="file" id="fileInput" accept=".xlsx,.xls,.csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+            <div class="upload-icon">📊</div>
+            <p id="uploadText">Click or drag & drop your Excel file here</p>
+            <small id="uploadSub">Supports .xlsx, .xls and .csv files</small>
+          </div>
+
+          <div class="notice-box">
+            <h4>⚙️ Server-side processing required</h4>
+            <p>Converting Excel to PDF with correct formatting, charts, and print areas requires a server-side engine. Browsers alone cannot reliably render Excel styles into PDF.</p>
+            <p>In the meantime, you can convert for free using <strong style="color:#93c5fd;">Microsoft Excel Online → File → Export → PDF</strong> or <strong style="color:#93c5fd;">Google Sheets → File → Download → PDF</strong>.</p>
+            <div class="coming-badge">🚧 Coming soon</div>
+          </div>
+
+          <div class="control-group">
+            <label>Output filename</label>
+            <input type="text" id="outputName" placeholder="spreadsheet-export" />
+          </div>
+
+          <button class="btn-primary" disabled>📊 Convert to PDF — Coming Soon</button>
+          <p class="status-msg" id="statusMsg">This tool will be available soon</p>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer><div class="container">© 2026 Toolez — free tools for everyone, zero data saved!</div></footer>
+
+  <script>
+    document.getElementById('fileInput').addEventListener('change', function() {
+      const f = this.files[0];
+      if (!f) return;
+      document.getElementById('uploadText').textContent = '📊 ' + f.name;
+      document.getElementById('uploadSub').textContent = (f.size / 1024).toFixed(0) + ' KB — loaded';
+      document.getElementById('outputName').value = f.name.replace(/\.(xlsx|xls|csv)$/i, '');
+      document.getElementById('statusMsg').textContent = 'File selected. Conversion will be available soon.';
+    });
+  </script>
+
+</body>
+</html>
