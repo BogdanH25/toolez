@@ -4,11 +4,13 @@ import subprocess
 import boto3
 from flask import Flask, request, jsonify, render_template, send_file
 from werkzeug.utils import secure_filename
+from flask_cors import CORS
 from dotenv import load_dotenv
 
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)
 app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024  # 100MB max upload
 
 # ---------------------------------------------------------------------------

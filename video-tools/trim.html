@@ -244,47 +244,117 @@
   </footer>
 
   <script>
-    let loadedFile = null;
+  const API_BASE = "https://fantastic-imagination-production.up.railway.app";
 
-    function handleFile(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      loadedFile = file;
-      document.getElementById('uploadText').textContent = '✅ ' + file.name;
-      document.getElementById('uploadSub').textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB — ready to trim';
-      document.getElementById('statusMsg').textContent = 'File loaded. Set your start and end times, then click Trim.';
+  let loadedFile = null;
+  let uploadedFileKey = null;
 
-      // Auto-detect duration
-      const url = URL.createObjectURL(file);
-      const vid = document.createElement('video');
-      vid.src = url;
-      vid.onloadedmetadata = () => {
-        document.getElementById('endTime').placeholder = 'e.g. ' + Math.floor(vid.duration);
-        if (!document.getElementById('endTime').value) {
-          document.getElementById('endTime').value = Math.floor(vid.duration);
-        }
-        URL.revokeObjectURL(url);
-      };
+  function setStatus(msg) {
+    document.getElementById('statusMsg').textContent = msg;
+  }
 
-      // Set default output name from filename
-      const baseName = file.name.replace(/\.[^/.]+$/, '');
-      document.getElementById('outputName').value = baseName + '-trimmed';
+  async function handleFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    loadedFile = file;
+    uploadedFileKey = null;
+
+    document.getElementById('uploadText').textContent = '✅ ' + file.name;
+    document.getElementById('uploadSub').textContent =
+      (file.size / (1024 * 1024)).toFixed(2) + ' MB — uploading...';
+    setStatus('Uploading file to server...');
+
+    const url = URL.createObjectURL(file);
+    const vid = document.createElement('video');
+    vid.src = url;
+    vid.onloadedmetadata = () => {
+      document.getElementById('endTime').placeholder = 'e.g. ' + Math.floor(vid.duration);
+      if (!document.getElementById('endTime').value) {
+        document.getElementById('endTime').value = Math.floor(vid.duration);
+      }
+      URL.revokeObjectURL(url);
+    };
+
+    const baseName = file.name.replace(/\.[^/.]+$/, '');
+    document.getElementById('outputName').value = baseName + '-trimmed';
+
+    try {
+      const formData = new FormData();
+      formData.append("video", file);
+
+      const res = await fetch(`${API_BASE}/api/upload`, {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Upload failed');
+      }
+
+      uploadedFileKey = data.file_key;
+
+      document.getElementById('uploadSub').textContent =
+        (file.size / (1024 * 1024)).toFixed(2) + ' MB — uploaded';
+      setStatus(`File uploaded. Duration detected: ${data.duration}s. Set start/end and click Trim.`);
+
+      if (!document.getElementById('endTime').value && data.duration) {
+        document.getElementById('endTime').value = Math.floor(data.duration);
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus('❌ Upload failed: ' + err.message);
+      document.getElementById('uploadSub').textContent = 'Upload failed';
+    }
+  }
+
+  async function trimVideo() {
+    if (!loadedFile || !uploadedFileKey) {
+      setStatus('⚠️ Please upload a video file first.');
+      return;
     }
 
-    function trimVideo() {
-      if (!loadedFile) {
-        document.getElementById('statusMsg').textContent = '⚠️ Please upload a video file first.';
-        return;
-      }
-      const start = parseFloat(document.getElementById('startTime').value);
-      const end = parseFloat(document.getElementById('endTime').value);
-      if (isNaN(start) || isNaN(end) || end <= start) {
-        document.getElementById('statusMsg').textContent = '⚠️ Please enter valid start and end times (end must be greater than start).';
-        return;
-      }
-      document.getElementById('statusMsg').textContent = '⏳ Processing... this feature will be available soon!';
+    const start = parseFloat(document.getElementById('startTime').value);
+    const end = parseFloat(document.getElementById('endTime').value);
+    const outputName = document.getElementById('outputName').value.trim() || 'trimmed-video';
+
+    if (isNaN(start) || isNaN(end) || end <= start) {
+      setStatus('⚠️ Please enter valid start and end times (end must be greater than start).');
+      return;
     }
-  </script>
+
+    setStatus('⏳ Processing trim...');
+
+    try {
+      const res = await fetch(`${API_BASE}/api/trim`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          file_key: uploadedFileKey,
+          start_time: start,
+          end_time: end,
+          output_name: outputName
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Trim failed');
+      }
+
+      setStatus('✅ Trim complete. Download starting...');
+      window.location.href = data.download_url;
+    } catch (err) {
+      console.error(err);
+      setStatus('❌ Trim failed: ' + err.message);
+    }
+  }
+</script>
 
 </body>
 </html>
