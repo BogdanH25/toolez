@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Toolez - Video, Audio, Files</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scrollbar-width: none;
+    }
+    html::-webkit-scrollbar {
+      display: none;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      line-height: 1.5;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .container {
+      width: min(1200px, 92%);
+      margin: 0 auto;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 10, 10, 0.95);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(10px);
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 16px 0;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-box {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: #fff;
+      color: #111;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .logo-text h1 {
+      font-size: 18px;
+    }
+
+    .logo-text p {
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    nav {
+      display: flex;
+      gap: 22px;
+      color: #cfcfcf;
+      font-size: 14px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 11px 16px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.14);
+    }
+
+    .btn-light {
+      background: #fff;
+      color: #111;
+    }
+
+    .hero {
+      padding: 70px 0 40px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: #cfcfcf;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .hero h2 {
+      font-size: clamp(34px, 6vw, 62px);
+      line-height: 1.05;
+      margin-bottom: 18px;
+    }
+
+    .hero p {
+      color: #aaa;
+      font-size: 18px;
+      max-width: 650px;
+      margin-bottom: 28px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 26px;
+    }
+
+    .quick-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .tag {
+      padding: 9px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: #121212;
+      color: #cfcfcf;
+      font-size: 14px;
+    }
+
+    .panel {
+      border: 1px solid rgba(255,255,255,0.1);
+      background: #111;
+      border-radius: 28px;
+      padding: 22px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      padding-bottom: 16px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .panel-head small {
+      color: #999;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .status {
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(34,197,94,0.12);
+      color: #9ff0b7;
+      border: 1px solid rgba(34,197,94,0.2);
+      white-space: nowrap;
+    }
+
+    .dropzone {
+      border: 2px dashed rgba(255,255,255,0.14);
+      border-radius: 22px;
+      padding: 40px 24px;
+      text-align: center;
+      background: #090909;
+    }
+
+    .dropzone .icon {
+      font-size: 54px;
+      margin-bottom: 12px;
+    }
+
+    .dropzone p:first-of-type {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .dropzone p:last-of-type {
+      color: #9f9f9f;
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    .tool-mini-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .mini-tool {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .mini-tool strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .mini-tool span {
+      color: #999;
+      font-size: 12px;
+    }
+
+    .section {
+      padding: 24px 0 34px;
+    }
+
+    .section-card {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      border-radius: 28px;
+      padding: 28px;
+    }
+
+    .section-top {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .section-top p {
+      color: #999;
+      font-size: 14px;
+    }
+
+    .section-top h3 {
+      font-size: 34px;
+    }
+
+    .search {
+      width: 100%;
+      max-width: 380px;
+      background: #090909;
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #fff;
+      border-radius: 18px;
+      padding: 14px 16px;
+      outline: none;
+    }
+
+    .popular-grid,
+    .categories-grid,
+    .info-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .popular-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .popular-item {
+      background: #0d0d0d;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 20px;
+      transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease, border-color 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .popular-item:hover {
+      transform: scale(1.045);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+      border-color: rgba(255,255,255,0.18);
+    }
+
+    .popular-item .popular-bg {
+      position: absolute;
+      inset: 0;
+      opacity: 0.06;
+      pointer-events: none;
+      background-size: 180px 180px;
+    }
+
+    .popular-item > div,
+    .popular-item .popular-icon {
+      position: relative;
+      z-index: 1;
+    }
+
+    .bg-video {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' fill='none' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='10' y='15' width='30' height='22' rx='3'/%3E%3Cpolygon points='22,22 22,32 30,27'/%3E%3Crect x='55' y='10' width='35' height='25' rx='2'/%3E%3Cline x1='55' y1='18' x2='90' y2='18'/%3E%3Ccircle cx='62' cy='14' r='2'/%3E%3Ccircle cx='69' cy='14' r='2'/%3E%3Cpath d='M120,12 L140,12 L140,32 L120,32 Z'/%3E%3Cpath d='M128,18 L128,26 M124,22 L132,22'/%3E%3Cpolygon points='15,60 15,80 30,70'/%3E%3Crect x='50' y='55' width='40' height='28' rx='4'/%3E%3Cpolygon points='65,64 65,76 76,70'/%3E%3Cpath d='M115,55 Q130,50 145,55 L145,80 Q130,75 115,80 Z'/%3E%3Crect x='10' y='105' width='28' height='20' rx='2'/%3E%3Cline x1='10' y1='110' x2='38' y2='110'/%3E%3Cpath d='M60,105 L80,105 L75,125 L55,125 Z'/%3E%3Ccircle cx='67' cy='115' r='5'/%3E%3Crect x='110' y='100' width='35' height='25' rx='3'/%3E%3Cpolygon points='122,108 122,118 130,113'/%3E%3Cpath d='M150,60 L170,60 L170,80 L150,80 Z M155,65 L165,70 L155,75 Z'/%3E%3Ccircle cx='160' cy='110' r='12'/%3E%3Cpolygon points='157,105 157,115 164,110'/%3E%3C/svg%3E");
+    }
+
+    .bg-audio {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' fill='none' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15,20 Q15,10 25,10 L25,35 Q15,35 15,25'/%3E%3Cpath d='M25,12 L35,8 L35,37 L25,33'/%3E%3Cpath d='M40,18 Q46,23 40,28'/%3E%3Cpath d='M44,14 Q54,23 44,32'/%3E%3Ccircle cx='80' cy='25' r='12'/%3E%3Cpath d='M76,25 L76,10 L88,10'/%3E%3Ccircle cx='140' cy='20' r='5'/%3E%3Cpath d='M145,20 L145,5'/%3E%3Cline x1='145' y1='5' x2='150' y2='5'/%3E%3Ccircle cx='120' cy='25' r='5'/%3E%3Cpath d='M125,25 L125,10'/%3E%3Cline x1='125' y1='10' x2='130' y2='10'/%3E%3Cpath d='M10,65 L10,85 M16,60 L16,90 M22,68 L22,82 M28,62 L28,88 M34,70 L34,80 M40,63 L40,87 M46,67 L46,83'/%3E%3Cpath d='M65,60 A10,10 0 0,1 75,70 L75,85 A5,5 0 0,1 65,85 L65,80 A5,5 0 0,1 75,80'/%3E%3Crect x='95' y='58' width='25' height='35' rx='12'/%3E%3Cline x1='107' y1='93' x2='107' y2='100'/%3E%3Cline x1='100' y1='100' x2='114' y2='100'/%3E%3Ccircle cx='150' cy='80' r='10'/%3E%3Ccircle cx='150' cy='80' r='4'/%3E%3Cpath d='M160,75 L165,65'/%3E%3Cpath d='M15,120 Q15,110 25,110 Q35,110 35,120 L35,140 L15,140 Z'/%3E%3Cline x1='25' y1='140' x2='25' y2='148'/%3E%3Cline x1='18' y1='148' x2='32' y2='148'/%3E%3Cpath d='M60,115 L60,145 M66,118 L66,142 M72,112 L72,148 M78,120 L78,140 M84,116 L84,144 M90,122 L90,138'/%3E%3Cpath d='M110,130 A15,15 0 1,1 140,130'/%3E%3Cpath d='M118,130 A7,7 0 1,1 132,130'/%3E%3Cpath d='M155,115 L155,145 L170,140 L170,120 Z'/%3E%3C/svg%3E");
+    }
+
+    .bg-docs {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' fill='none' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='10' y='10' width='25' height='32' rx='2'/%3E%3Cline x1='15' y1='18' x2='30' y2='18'/%3E%3Cline x1='15' y1='23' x2='30' y2='23'/%3E%3Cline x1='15' y1='28' x2='25' y2='28'/%3E%3Cpath d='M55,10 L75,10 L80,15 L80,42 L55,42 Z M75,10 L75,15 L80,15'/%3E%3Cline x1='60' y1='22' x2='75' y2='22'/%3E%3Cline x1='60' y1='27' x2='75' y2='27'/%3E%3Cline x1='60' y1='32' x2='70' y2='32'/%3E%3Crect x='110' y='8' width='30' height='38' rx='2'/%3E%3Cline x1='115' y1='16' x2='135' y2='16'/%3E%3Cline x1='115' y1='21' x2='135' y2='21'/%3E%3Cline x1='115' y1='26' x2='135' y2='26'/%3E%3Cline x1='115' y1='31' x2='128' y2='31'/%3E%3Crect x='10' y='60' width='28' height='35' rx='2'/%3E%3Cpath d='M10,72 L38,72'/%3E%3Cpath d='M15,78 L33,78 M15,83 L30,83'/%3E%3Ccircle cx='75' cy='75' r='15'/%3E%3Cpath d='M68,75 L72,79 L82,69'/%3E%3Crect x='110' y='58' width='22' height='28' rx='2'/%3E%3Crect x='118' y='66' width='22' height='28' rx='2'/%3E%3Cpath d='M10,115 L35,115 L35,150 L10,150 Z'/%3E%3Cpath d='M15,122 L30,122 M15,128 L30,128 M15,134 L25,134'/%3E%3Cpath d='M55,115 L80,115 L80,150 L55,150 Z M55,115 L67,130 L80,115 M55,150 L67,138 M80,150 L67,138'/%3E%3Crect x='105' y='112' width='30' height='40' rx='2'/%3E%3Cpath d='M120,125 L120,140 M113,132 L127,132'/%3E%3Cpath d='M150,60 L170,60 L170,92 L150,92 Z'/%3E%3Cline x1='155' y1='68' x2='165' y2='68'/%3E%3Cline x1='155' y1='73' x2='165' y2='73'/%3E%3Cline x1='155' y1='78' x2='162' y2='78'/%3E%3C/svg%3E");
+    }
+
+    .popular-item p {
+      color: #999;
+      font-size: 14px;
+      margin: 8px 0 12px;
+    }
+
+    .popular-item a {
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      font-size: 14px;
+    }
+
+    .section-heading {
+      margin-bottom: 24px;
+    }
+
+    .section-heading p {
+      color: #999;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .section-heading h3 {
+      font-size: 38px;
+    }
+
+    .categories-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .category-card {
+      background: #111;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 26px;
+      padding: 22px;
+      transition: 0.2s ease;
+    }
+
+    .category-head {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .category-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.08);
+      font-size: 24px;
+    }
+
+    .category-head small {
+      color: #999;
+      display: block;
+      font-size: 13px;
+      margin-top: 3px;
+    }
+
+    .tool-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .tool-pill {
+      padding: 10px 12px;
+      font-size: 14px;
+      color: #d0d0d0;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .info-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .info-card {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      border-radius: 28px;
+      padding: 28px;
+    }
+
+    .info-card p.top {
+      color: #999;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .info-card h4 {
+      font-size: 30px;
+      margin-bottom: 16px;
+    }
+
+    .info-card p.text {
+      color: #aaa;
+      margin-bottom: 20px;
+    }
+
+    .code-box {
+      background: #090909;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 16px;
+      font-family: Consolas, monospace;
+      color: #cfcfcf;
+      white-space: pre-line;
+      font-size: 14px;
+    }
+
+    .plan-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .plan-item {
+      background: #0d0d0d;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .plan-item strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .plan-item span {
+      color: #999;
+      font-size: 14px;
+    }
+
+    .cta {
+      padding: 42px 0 70px;
+    }
+
+    .cta-box {
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 32px;
+      padding: 40px 28px;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+    }
+
+    .cta-box p.top {
+      color: #999;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .cta-box h3 {
+      font-size: clamp(32px, 5vw, 54px);
+      margin-bottom: 16px;
+    }
+
+    .cta-box p.text {
+      color: #aaa;
+      max-width: 850px;
+      margin: 0 auto 24px;
+      font-size: 17px;
+    }
+
+    .cta-buttons {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      color: #888;
+      padding: 22px 0 34px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 1024px) {
+      .hero-grid,
+      .popular-grid,
+      .categories-grid,
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      nav {
+        display: none;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .tool-mini-grid,
+      .tool-list {
+        grid-template-columns: 1fr;
+      }
+
+      .section-top h3,
+      .section-heading h3 {
+        font-size: 28px;
+      }
+
+      .panel,
+      .section-card,
+      .info-card,
+      .cta-box,
+      .category-card {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-inner">
+      <div class="logo">
+        <div class="logo-box">T</div>
+        <div class="logo-text">
+          <h1>Toolez</h1>
+          <p>Everything you need. Nothing to pay.</p>
+        </div>
+      </div>
+
+      <nav>
+        <a href="#tools">Donate a coffee</a>
+      </nav>   
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+           <h1>Your powerfull tool</h1>
+        <p style="font-size: 15px">
+           Your all-in-one tools for everything
+        </p>
+    </div>
+  </section>
+
+  <section class="section" id="popular">
+    <div class="container">
+      <div class="section-card">
+        <div class="section-top">
+          <div>
+            <h3>Select tool:</h3>
+          </div>
+          <input class="search" type="text" placeholder="Search..." />
+        </div>
+
+        <div class="popular-grid">
+          <a href="video-tools.html" class="popular-item" style="background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(59,130,246,0.08));">
+            <div class="popular-bg bg-video"></div>
+            <div>
+              <strong>Video Tools</strong>
+              <p>Fast online utility</p>
+            </div>
+            <div class="popular-icon">🎬</div>
+          </a>
+          <a href="audio-tools.html" class="popular-item" style="background: linear-gradient(135deg, rgba(236,72,153,0.15), rgba(249,115,22,0.08));">
+            <div class="popular-bg bg-audio"></div>
+            <div>
+              <strong>Audio Tools</strong>
+              <p>Fast online utility</p>
+            </div>
+            <div class="popular-icon">🎧</div>
+          </a>
+          <a href="document-tools.html" class="popular-item" style="background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(20,184,166,0.08));">
+            <div class="popular-bg bg-docs"></div>
+            <div>
+              <strong>Document Tools</strong>
+              <p>Fast online utility</p>
+            </div>
+            <div class="popular-icon">📄</div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="tools">
+    <div class="container">
+      <div class="section-heading">
+        <h3>All tools in one place</h3>
+		<p>Categories</p>
+      </div>
+
+      <div class="categories-grid">
+        <div class="category-card">
+          <div class="category-head">
+            <div class="category-icon">🎬</div>
+            <div>
+              <strong>Video</strong>
+              <small>8 tool-uri incluse</small>
+            </div>
+          </div>
+          <div class="tool-list">
+            <div class="tool-pill">Trim / Cut</div>
+            <div class="tool-pill">Merge Video</div>
+            <div class="tool-pill">Resize / Crop</div>
+            <div class="tool-pill">Rotate / Flip</div>
+            <div class="tool-pill">Mute / Extract Audio</div>
+            <div class="tool-pill">Convert MP4 / WebM / MOV</div>
+            <div class="tool-pill">Compress Video</div>
+            <div class="tool-pill">Add Subtitles</div>
+          </div>
+        </div>
+
+        <div class="category-card">
+          <div class="category-head">
+            <div class="category-icon">🎧</div>
+            <div>
+              <strong>Audio</strong>
+              <small>8 tool-uri incluse</small>
+            </div>
+          </div>
+          <div class="tool-list">
+            <div class="tool-pill">Trim Audio</div>
+            <div class="tool-pill">Merge MP3 / WAV</div>
+            <div class="tool-pill">Volume Booster</div>
+            <div class="tool-pill">Convert MP3 / WAV / OGG</div>
+            <div class="tool-pill">Noise Reduction</div>
+            <div class="tool-pill">Fade In / Fade Out</div>
+            <div class="tool-pill">Change Speed</div>
+            <div class="tool-pill">Extract from Video</div>
+          </div>
+        </div>
+
+        <div class="category-card">
+          <div class="category-head">
+            <div class="category-icon">📁</div>
+            <div>
+              <strong>Files</strong>
+              <small>8 tool-uri incluse</small>
+            </div>
+          </div>
+          <div class="tool-list">
+            <div class="tool-pill">PDF Merge / Split</div>
+            <div class="tool-pill">Compress PDF</div>
+            <div class="tool-pill">DOCX to PDF</div>
+            <div class="tool-pill">ZIP / Unzip</div>
+            <div class="tool-pill">Rename Batch Files</div>
+            <div class="tool-pill">JSON Formatter</div>
+            <div class="tool-pill">CSV Cleaner</div>
+            <div class="tool-pill">File Metadata Viewer</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <div class="container">
+      <div class="cta-box">
+        <h2>Give us a feedback and new tools ideas</h2>
+        <p class="text">
+          TEXT
+        </p>
+        <div class="cta-buttons">
+          <button class="btn btn-light">Send Message</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      © 2026 Toolez — free tools for everyone, zero data saved!
+    </div>
+  </footer>
+</body>
+</html>
