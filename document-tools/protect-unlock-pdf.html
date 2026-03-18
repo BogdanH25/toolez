@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Toolez - Protect / Unlock PDF</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; line-height: 1.5; min-height: 100vh; display: flex; flex-direction: column; }
+    a { text-decoration: none; color: inherit; }
+    .container { width: min(1200px, 92%); margin: 0 auto; }
+
+    /* HEADER */
+    header { position: sticky; top: 0; z-index: 100; background: rgba(10,10,10,0.95); border-bottom: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(10px); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 0; flex-wrap: wrap; }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-box { width: 42px; height: 42px; border-radius: 14px; background: #fff; color: #111; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
+    .logo-text h1 { font-size: 18px; }
+    .logo-text p { font-size: 12px; color: #aaa; }
+    nav { display: flex; gap: 22px; color: #cfcfcf; font-size: 14px; }
+    nav a:hover { color: #fff; }
+
+    /* BREADCRUMB */
+    .breadcrumb { padding: 18px 0 0; display: flex; align-items: center; gap: 8px; font-size: 14px; color: #666; flex-wrap: wrap; }
+    .breadcrumb a { color: #888; transition: color 0.2s; }
+    .breadcrumb a:hover { color: #fff; }
+    .breadcrumb span { color: #444; }
+    .breadcrumb strong { color: #d0d0d0; }
+
+    /* PAGE TITLE */
+    .page-title { padding: 16px 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .page-title-left { display: flex; align-items: center; gap: 14px; }
+    .tool-badge { width: 48px; height: 48px; border-radius: 14px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.25); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .page-title h2 { font-size: 26px; }
+    .page-title p { font-size: 14px; color: #888; margin-top: 3px; }
+    .back-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #cfcfcf; font-size: 14px; transition: 0.2s ease; }
+    .back-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+    /* SPLIT PANEL */
+    .main { flex: 1; padding-bottom: 50px; }
+    .split-card { border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); border-radius: 28px; overflow: hidden; display: grid; grid-template-columns: 1fr 1px 1fr; min-height: 520px; }
+    .divider { background: rgba(255,255,255,0.07); }
+
+    /* LEFT PANEL */
+    .panel-left { padding: 32px 30px; display: flex; flex-direction: column; gap: 24px; }
+    .panel-label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: #555; text-transform: uppercase; margin-bottom: 4px; }
+    .panel-left h3 { font-size: 20px; color: #f0f0f0; }
+    .instructions { display: flex; flex-direction: column; gap: 14px; }
+    .step { display: flex; gap: 14px; align-items: flex-start; }
+    .step-num { width: 28px; height: 28px; border-radius: 9px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.25); color: #86efac; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .step-text strong { display: block; font-size: 14px; color: #e0e0e0; margin-bottom: 3px; }
+    .step-text span { font-size: 13px; color: #777; }
+    .info-box { background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.15); border-radius: 16px; padding: 16px 18px; }
+    .info-box p { font-size: 13px; color: #999; line-height: 1.6; }
+    .info-box p strong { color: #86efac; }
+    .warn-box { background: rgba(251,191,36,0.05); border: 1px solid rgba(251,191,36,0.18); border-radius: 16px; padding: 14px 16px; }
+    .warn-box p { font-size: 12px; color: #a16207; line-height: 1.6; }
+    .warn-box p strong { color: #fbbf24; }
+    .supported { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .format-tag { padding: 5px 12px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); font-size: 12px; color: #aaa; }
+
+    /* RIGHT PANEL */
+    .panel-right { padding: 32px 30px; display: flex; flex-direction: column; gap: 20px; }
+    .panel-right h3 { font-size: 20px; color: #f0f0f0; }
+
+    /* Mode tabs */
+    .mode-tabs { display: flex; gap: 8px; }
+    .mode-tab { flex: 1; padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #aaa; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; transition: 0.2s; }
+    .mode-tab.active { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.35); color: #86efac; }
+
+    /* Tool blocks */
+    .tool-block { display: none; flex-direction: column; gap: 16px; }
+    .tool-block.active { display: flex; }
+
+    /* Upload zone */
+    .upload-zone { border: 2px dashed rgba(255,255,255,0.1); border-radius: 20px; padding: 32px 24px; text-align: center; background: #090909; cursor: pointer; transition: border-color 0.25s ease, background 0.25s ease; position: relative; }
+    .upload-zone:hover { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.04); }
+    .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .upload-icon { font-size: 36px; margin-bottom: 8px; }
+    .upload-zone p { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+    .upload-zone small { font-size: 13px; color: #666; }
+
+    /* Controls */
+    .control-group { display: flex; flex-direction: column; gap: 6px; }
+    .control-group label { font-size: 13px; color: #888; }
+    .control-group input[type="text"],
+    .control-group input[type="password"] { background: #0d0d0d; border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 12px; padding: 11px 14px; font-size: 14px; outline: none; transition: border-color 0.2s; width: 100%; }
+    .control-group input:focus { border-color: rgba(34,197,94,0.45); }
+    .control-group input::placeholder { color: #444; }
+    .password-wrap { position: relative; }
+    .password-wrap input { padding-right: 44px; }
+    .toggle-pw { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #555; cursor: pointer; font-size: 16px; padding: 0; line-height: 1; }
+    .toggle-pw:hover { color: #aaa; }
+    .pw-strength { height: 4px; border-radius: 2px; margin-top: 6px; background: rgba(255,255,255,0.06); overflow: hidden; }
+    .pw-strength-fill { height: 100%; border-radius: 2px; transition: width 0.3s ease, background 0.3s ease; width: 0%; }
+    .pw-hint { font-size: 11px; color: #555; margin-top: 4px; }
+    .control-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* Permissions checkboxes */
+    .perm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .perm-item { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #0d0d0d; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; cursor: pointer; transition: border-color 0.2s; }
+    .perm-item:hover { border-color: rgba(34,197,94,0.25); }
+    .perm-item input[type="checkbox"] { accent-color: #22c55e; width: 15px; height: 15px; flex-shrink: 0; cursor: pointer; }
+    .perm-item span { font-size: 12px; color: #aaa; }
+
+    /* Action button */
+    .btn-primary { width: 100%; padding: 14px; border-radius: 16px; background: rgba(34,197,94,0.85); color: #fff; border: none; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s ease, transform 0.15s ease; letter-spacing: 0.02em; }
+    .btn-primary:hover { background: rgba(34,197,94,1); transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+
+    /* Status */
+    .status-msg { font-size: 13px; color: #666; text-align: center; padding: 4px 0; min-height: 22px; }
+    .status-msg.ok { color: #86efac; }
+    .status-msg.err { color: #f87171; }
+
+    footer { border-top: 1px solid rgba(255,255,255,0.08); color: #888; padding: 22px 0 30px; font-size: 14px; }
+
+    @media (max-width: 860px) { .split-card { grid-template-columns: 1fr; } .divider { width: 100%; height: 1px; } }
+    @media (max-width: 600px) { .page-title h2 { font-size: 20px; } .control-row, .perm-grid { grid-template-columns: 1fr; } .panel-left, .panel-right { padding: 22px 18px; } }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-box">T</div>
+        <div class="logo-text"><h1>Toolez</h1><p>Everything you need. Nothing to pay.</p></div>
+      </a>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="#">Donate a coffee</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a><span>/</span>
+        <a href="../document-tools.html">Document Tools</a><span>/</span>
+        <strong>Protect / Unlock PDF</strong>
+      </div>
+
+      <div class="page-title">
+        <div class="page-title-left">
+          <div class="tool-badge">🔒</div>
+          <div>
+            <h2>Protect / Unlock PDF</h2>
+            <p>Add a password to secure your PDF, or remove an existing one</p>
+          </div>
+        </div>
+        <a href="../document-tools.html" class="back-btn">← Back to Document Tools</a>
+      </div>
+
+      <div class="split-card">
+
+        <!-- LEFT — Instructions -->
+        <div class="panel-left">
+          <div>
+            <div class="panel-label">How it works</div>
+            <h3 id="leftTitle">Instructions</h3>
+          </div>
+
+          <!-- Protect steps (shown by default) -->
+          <div class="instructions" id="stepsProtect">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-text">
+                <strong>Upload your PDF</strong>
+                <span>Click the upload area or drag & drop your PDF file</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-text">
+                <strong>Set a password</strong>
+                <span>Type a strong password — the strength meter shows how secure it is</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-text">
+                <strong>Choose permissions</strong>
+                <span>Optionally restrict printing, copying or editing of the protected PDF</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div class="step-text">
+                <strong>Download protected PDF</strong>
+                <span>Your password-protected PDF is generated in the browser and downloaded</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Unlock steps (hidden by default) -->
+          <div class="instructions" id="stepsUnlock" style="display:none;">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-text">
+                <strong>Upload your protected PDF</strong>
+                <span>Click the upload area or drag & drop the password-protected PDF</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-text">
+                <strong>Enter the current password</strong>
+                <span>You must know the PDF's existing password to remove it</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-text">
+                <strong>Click Unlock PDF</strong>
+                <span>The password is removed and a new unprotected PDF is created</span>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div class="step-text">
+                <strong>Download the unlocked file</strong>
+                <span>Your PDF is now free of any password restriction</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="warn-box">
+            <p><strong>⚠️ Important:</strong> This tool can only remove passwords you already know. It cannot crack or brute-force unknown passwords.</p>
+          </div>
+
+          <div class="info-box">
+            <p><strong>100% private.</strong> Your PDF never leaves your device. All processing happens inside your browser with no server involved.</p>
+          </div>
+
+          <div>
+            <div class="panel-label" style="margin-bottom:10px;">Supported format</div>
+            <div class="supported">
+              <span class="format-tag">PDF</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- RIGHT — Tool -->
+        <div class="panel-right">
+          <div>
+            <div class="panel-label">Tool</div>
+            <h3>Protect / Unlock PDF</h3>
+          </div>
+
+          <div class="mode-tabs">
+            <div class="mode-tab active" id="tab-protect" onclick="switchMode('protect')">🔒 Protect PDF</div>
+            <div class="mode-tab" id="tab-unlock" onclick="switchMode('unlock')">🔓 Unlock PDF</div>
+          </div>
+
+          <!-- ── PROTECT BLOCK ── -->
+          <div class="tool-block active" id="block-protect">
+
+            <div class="upload-zone">
+              <input type="file" id="protectInput" accept="application/pdf" />
+              <div class="upload-icon">📄</div>
+              <p id="protectUploadText">Click or drag & drop your PDF here</p>
+              <small id="protectUploadSub">Only PDF files accepted</small>
+            </div>
+
+            <div class="control-group">
+              <label>Password</label>
+              <div class="password-wrap">
+                <input type="password" id="protectPw" placeholder="Enter a strong password..." oninput="checkStrength()" />
+                <button class="toggle-pw" onclick="togglePw('protectPw', this)" type="button">👁</button>
+              </div>
+              <div class="pw-strength"><div class="pw-strength-fill" id="pwFill"></div></div>
+              <div class="pw-hint" id="pwHint">Enter a password to see its strength</div>
+            </div>
+
+            <div class="control-group">
+              <label>Confirm password</label>
+              <div class="password-wrap">
+                <input type="password" id="protectPwConfirm" placeholder="Repeat the password..." />
+                <button class="toggle-pw" onclick="togglePw('protectPwConfirm', this)" type="button">👁</button>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label style="margin-bottom:8px;">Restrict permissions (optional)</label>
+              <div class="perm-grid">
+                <label class="perm-item"><input type="checkbox" id="permPrint" /><span>Allow printing</span></label>
+                <label class="perm-item"><input type="checkbox" id="permCopy" /><span>Allow copying text</span></label>
+                <label class="perm-item"><input type="checkbox" id="permEdit" /><span>Allow editing</span></label>
+                <label class="perm-item"><input type="checkbox" id="permAnnot" /><span>Allow annotations</span></label>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label>Output filename</label>
+              <input type="text" id="protectName" placeholder="protected-document" />
+            </div>
+
+            <button class="btn-primary" onclick="protectPDF()">🔒 Protect PDF</button>
+          </div>
+
+          <!-- ── UNLOCK BLOCK ── -->
+          <div class="tool-block" id="block-unlock">
+
+            <div class="upload-zone">
+              <input type="file" id="unlockInput" accept="application/pdf" />
+              <div class="upload-icon">🔓</div>
+              <p id="unlockUploadText">Click or drag & drop your protected PDF</p>
+              <small id="unlockUploadSub">Only PDF files accepted</small>
+            </div>
+
+            <div class="control-group">
+              <label>Current password</label>
+              <div class="password-wrap">
+                <input type="password" id="unlockPw" placeholder="Enter the PDF password..." />
+                <button class="toggle-pw" onclick="togglePw('unlockPw', this)" type="button">👁</button>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label>Output filename</label>
+              <input type="text" id="unlockName" placeholder="unlocked-document" />
+            </div>
+
+            <button class="btn-primary" onclick="unlockPDF()">🔓 Unlock PDF</button>
+          </div>
+
+          <p class="status-msg" id="statusMsg">Select a mode and upload your PDF to get started</p>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">© 2026 Toolez — free tools for everyone, zero data saved!</div>
+  </footer>
+
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script>
+    let protectFile = null;
+    let unlockFile  = null;
+
+    /* ── MODE SWITCH ── */
+    function switchMode(mode) {
+      ['protect','unlock'].forEach(m => {
+        document.getElementById('tab-' + m).classList.toggle('active', m === mode);
+        document.getElementById('block-' + m).classList.toggle('active', m === mode);
+      });
+      document.getElementById('stepsProtect').style.display = mode === 'protect' ? 'flex' : 'none';
+      document.getElementById('stepsUnlock').style.display  = mode === 'unlock'  ? 'flex' : 'none';
+      setStatus('', '');
+    }
+
+    /* ── FILE INPUTS ── */
+    document.getElementById('protectInput').addEventListener('change', function() {
+      const f = this.files[0];
+      if (!f || f.type !== 'application/pdf') { setStatus('⚠️ Please select a valid PDF file.', 'err'); return; }
+      protectFile = f;
+      document.getElementById('protectUploadText').textContent = '✅ ' + f.name;
+      document.getElementById('protectUploadSub').textContent = (f.size / 1024).toFixed(0) + ' KB — ready';
+      document.getElementById('protectName').value = f.name.replace(/\.pdf$/i, '') + '-protected';
+      setStatus('PDF loaded. Set a password and click Protect.', '');
+    });
+
+    document.getElementById('unlockInput').addEventListener('change', function() {
+      const f = this.files[0];
+      if (!f || f.type !== 'application/pdf') { setStatus('⚠️ Please select a valid PDF file.', 'err'); return; }
+      unlockFile = f;
+      document.getElementById('unlockUploadText').textContent = '✅ ' + f.name;
+      document.getElementById('unlockUploadSub').textContent = (f.size / 1024).toFixed(0) + ' KB — ready';
+      document.getElementById('unlockName').value = f.name.replace(/\.pdf$/i, '') + '-unlocked';
+      setStatus('PDF loaded. Enter the password and click Unlock.', '');
+    });
+
+    /* ── PASSWORD STRENGTH ── */
+    function checkStrength() {
+      const pw = document.getElementById('protectPw').value;
+      const fill = document.getElementById('pwFill');
+      const hint = document.getElementById('pwHint');
+      if (!pw) { fill.style.width = '0%'; hint.textContent = 'Enter a password to see its strength'; return; }
+      let score = 0;
+      if (pw.length >= 8)  score++;
+      if (pw.length >= 12) score++;
+      if (/[A-Z]/.test(pw)) score++;
+      if (/[0-9]/.test(pw)) score++;
+      if (/[^A-Za-z0-9]/.test(pw)) score++;
+      const levels = [
+        { w: '20%', bg: '#ef4444', label: 'Very weak' },
+        { w: '40%', bg: '#f97316', label: 'Weak' },
+        { w: '60%', bg: '#eab308', label: 'Fair' },
+        { w: '80%', bg: '#84cc16', label: 'Strong' },
+        { w: '100%', bg: '#22c55e', label: 'Very strong' },
+      ];
+      const l = levels[Math.max(0, score - 1)];
+      fill.style.width = l.w;
+      fill.style.background = l.bg;
+      hint.textContent = l.label;
+    }
+
+    /* ── TOGGLE PASSWORD VISIBILITY ── */
+    function togglePw(inputId, btn) {
+      const input = document.getElementById(inputId);
+      const isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+      btn.textContent = isHidden ? '🙈' : '👁';
+    }
+
+    /* ── PROTECT ACTION ── */
+    async function protectPDF() {
+      if (!protectFile) { setStatus('⚠️ Please upload a PDF file first.', 'err'); return; }
+      const pw = document.getElementById('protectPw').value;
+      const pwConfirm = document.getElementById('protectPwConfirm').value;
+      if (!pw) { setStatus('⚠️ Please enter a password.', 'err'); return; }
+      if (pw !== pwConfirm) { setStatus('⚠️ Passwords do not match. Please check and try again.', 'err'); return; }
+
+      setStatus('⏳ Protecting PDF...', '');
+      try {
+        const { PDFDocument } = PDFLib;
+        const bytes = await protectFile.arrayBuffer();
+        const pdf = await PDFDocument.load(bytes);
+
+        // Build permissions mask
+        const perms = {
+          printing: document.getElementById('permPrint').checked ? 'highResolution' : undefined,
+          copying:  document.getElementById('permCopy').checked,
+          modifying: document.getElementById('permEdit').checked,
+          annotating: document.getElementById('permAnnot').checked,
+        };
+
+        const outBytes = await pdf.save({
+          userPassword: pw,
+          ownerPassword: pw + '_owner',
+          permissions: {
+            printing:   perms.printing,
+            modifying:  perms.modifying,
+            copying:    perms.copying,
+            annotating: perms.annotating,
+          },
+        });
+
+        const name = (document.getElementById('protectName').value.trim() || 'protected-document') + '.pdf';
+        downloadBytes(outBytes, name, 'application/pdf');
+        setStatus('✅ PDF protected successfully! Download started.', 'ok');
+      } catch (e) {
+        setStatus('❌ Error: Could not protect this PDF. It may already be encrypted or corrupted.', 'err');
+      }
+    }
+
+    /* ── UNLOCK ACTION ── */
+    async function unlockPDF() {
+      if (!unlockFile) { setStatus('⚠️ Please upload a PDF file first.', 'err'); return; }
+      const pw = document.getElementById('unlockPw').value;
+      if (!pw) { setStatus('⚠️ Please enter the current PDF password.', 'err'); return; }
+
+      setStatus('⏳ Unlocking PDF...', '');
+      try {
+        const { PDFDocument } = PDFLib;
+        const bytes = await unlockFile.arrayBuffer();
+
+        // Load with the provided password
+        let pdf;
+        try {
+          pdf = await PDFDocument.load(bytes, { password: pw });
+        } catch (loadErr) {
+          setStatus('❌ Wrong password or the PDF is not encrypted with a standard user password.', 'err');
+          return;
+        }
+
+        // Re-save without any password encryption
+        const outBytes = await pdf.save();
+        const name = (document.getElementById('unlockName').value.trim() || 'unlocked-document') + '.pdf';
+        downloadBytes(outBytes, name, 'application/pdf');
+        setStatus('✅ PDF unlocked successfully! Download started.', 'ok');
+      } catch (e) {
+        setStatus('❌ Error: Could not unlock this PDF. Make sure the password is correct.', 'err');
+      }
+    }
+
+    /* ── HELPERS ── */
+    function setStatus(msg, type) {
+      const el = document.getElementById('statusMsg');
+      el.textContent = msg || 'Select a mode and upload your PDF to get started';
+      el.className = 'status-msg' + (type ? ' ' + type : '');
+    }
+
+    function downloadBytes(bytes, filename, mime) {
+      const blob = new Blob([bytes], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    }
+  </script>
+
+</body>
+</html>
