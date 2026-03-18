@@ -78,7 +78,7 @@ def cleanup(*files):
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return jsonify({"status": "ok"})
 
 
 @app.route("/api/upload", methods=["POST"])
