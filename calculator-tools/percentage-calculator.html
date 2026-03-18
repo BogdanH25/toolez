@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Toolez - Percentage Calculator</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; line-height: 1.5; min-height: 100vh; display: flex; flex-direction: column; }
+    a { text-decoration: none; color: inherit; }
+    .container { width: min(1200px, 92%); margin: 0 auto; }
+    header { position: sticky; top: 0; z-index: 100; background: rgba(10,10,10,0.95); border-bottom: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(10px); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 0; flex-wrap: wrap; }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-box { width: 42px; height: 42px; border-radius: 14px; background: #fff; color: #111; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
+    .logo-text h1 { font-size: 18px; }
+    .logo-text p { font-size: 12px; color: #aaa; }
+    nav { display: flex; gap: 22px; color: #cfcfcf; font-size: 14px; }
+    nav a:hover { color: #fff; }
+    .breadcrumb { padding: 18px 0 0; display: flex; align-items: center; gap: 8px; font-size: 14px; color: #666; flex-wrap: wrap; }
+    .breadcrumb a { color: #888; transition: color 0.2s; }
+    .breadcrumb a:hover { color: #fff; }
+    .breadcrumb span { color: #444; }
+    .breadcrumb strong { color: #d0d0d0; }
+    .page-title { padding: 16px 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .page-title-left { display: flex; align-items: center; gap: 14px; }
+    .tool-badge { width: 48px; height: 48px; border-radius: 14px; background: rgba(251,113,133,0.15); border: 1px solid rgba(251,113,133,0.25); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .page-title h2 { font-size: 26px; }
+    .page-title p { font-size: 14px; color: #888; margin-top: 3px; }
+    .back-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #cfcfcf; font-size: 14px; transition: 0.2s ease; }
+    .back-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .main { flex: 1; padding-bottom: 50px; }
+    .split-card { border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); border-radius: 28px; overflow: hidden; display: grid; grid-template-columns: 1fr 1px 1fr; min-height: 520px; }
+    .divider { background: rgba(255,255,255,0.07); }
+    .panel-left { padding: 32px 30px; display: flex; flex-direction: column; gap: 24px; }
+    .panel-label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: #555; text-transform: uppercase; margin-bottom: 4px; }
+    .panel-left h3 { font-size: 20px; color: #f0f0f0; }
+    .instructions { display: flex; flex-direction: column; gap: 14px; }
+    .step { display: flex; gap: 14px; align-items: flex-start; }
+    .step-num { width: 28px; height: 28px; border-radius: 9px; background: rgba(251,113,133,0.15); border: 1px solid rgba(251,113,133,0.25); color: #fca5a5; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .step-text strong { display: block; font-size: 14px; color: #e0e0e0; margin-bottom: 3px; }
+    .step-text span { font-size: 13px; color: #777; }
+    .info-box { background: rgba(251,113,133,0.06); border: 1px solid rgba(251,113,133,0.15); border-radius: 16px; padding: 16px 18px; }
+    .info-box p { font-size: 13px; color: #999; line-height: 1.6; }
+    .info-box p strong { color: #fca5a5; }
+    .formula-list { display: flex; flex-direction: column; gap: 10px; }
+    .formula-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 12px 14px; }
+    .formula-item strong { font-size: 13px; color: #e0e0e0; display: block; margin-bottom: 3px; }
+    .formula-item span { font-size: 12px; color: #666; font-family: monospace; }
+    .panel-right { padding: 32px 30px; display: flex; flex-direction: column; gap: 20px; }
+    .panel-right h3 { font-size: 20px; color: #f0f0f0; }
+    .mode-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+    .mode-tab { padding: 8px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #aaa; font-size: 13px; cursor: pointer; transition: 0.2s; }
+    .mode-tab.active { background: rgba(251,113,133,0.15); border-color: rgba(251,113,133,0.35); color: #fca5a5; font-weight: 600; }
+    .calc-block { display: none; flex-direction: column; gap: 14px; }
+    .calc-block.active { display: flex; }
+    .control-group { display: flex; flex-direction: column; gap: 6px; }
+    .control-group label { font-size: 13px; color: #888; }
+    .control-group input[type="number"] { background: #0d0d0d; border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 12px; padding: 11px 14px; font-size: 14px; outline: none; transition: border-color 0.2s; width: 100%; }
+    .control-group input:focus { border-color: rgba(251,113,133,0.45); }
+    .control-group input::placeholder { color: #444; }
+    .control-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .result-box { background: #090909; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px 22px; }
+    .result-box .result-label { font-size: 12px; color: #555; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+    .result-box .result-value { font-size: 36px; font-weight: 700; color: #fca5a5; }
+    .result-box .result-desc { font-size: 13px; color: #555; margin-top: 6px; }
+    footer { border-top: 1px solid rgba(255,255,255,0.08); color: #888; padding: 22px 0 30px; font-size: 14px; }
+    @media (max-width: 860px) { .split-card { grid-template-columns: 1fr; } .divider { width: 100%; height: 1px; } }
+    @media (max-width: 600px) { .page-title h2 { font-size: 20px; } .control-row { grid-template-columns: 1fr; } .panel-left, .panel-right { padding: 22px 18px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-box">T</div>
+        <div class="logo-text"><h1>Toolez</h1><p>Everything you need. Nothing to pay.</p></div>
+      </a>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="#">Donate a coffee</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a><span>/</span>
+        <a href="../calculator-tools.html">Calculator Tools</a><span>/</span>
+        <strong>Percentage Calculator</strong>
+      </div>
+      <div class="page-title">
+        <div class="page-title-left">
+          <div class="tool-badge">💯</div>
+          <div><h2>Percentage Calculator</h2><p>Calculate percentages, increases, decreases and more</p></div>
+        </div>
+        <a href="../calculator-tools.html" class="back-btn">← Back to Calculator Tools</a>
+      </div>
+
+      <div class="split-card">
+        <!-- LEFT -->
+        <div class="panel-left">
+          <div>
+            <div class="panel-label">How it works</div>
+            <h3>Instructions</h3>
+          </div>
+          <div class="instructions">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-text"><strong>Pick a calculation mode</strong><span>Choose from 3 types: basic %, what % is X of Y, or % increase/decrease</span></div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-text"><strong>Enter your numbers</strong><span>Fill in the required fields for the chosen mode</span></div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-text"><strong>Read the result</strong><span>The answer appears instantly below as you type</span></div>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>3 modes available.</strong> Switch between them using the tabs on the right panel.</p>
+          </div>
+          <div>
+            <div class="panel-label" style="margin-bottom:10px;">Formulas used</div>
+            <div class="formula-list">
+              <div class="formula-item">
+                <strong>X% of Y</strong>
+                <span>result = Y × (X / 100)</span>
+              </div>
+              <div class="formula-item">
+                <strong>X is what % of Y?</strong>
+                <span>result = (X / Y) × 100</span>
+              </div>
+              <div class="formula-item">
+                <strong>% change from A to B</strong>
+                <span>result = ((B - A) / A) × 100</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- RIGHT -->
+        <div class="panel-right">
+          <div>
+            <div class="panel-label">Tool</div>
+            <h3>Percentage Calculator</h3>
+          </div>
+
+          <div class="mode-tabs">
+            <div class="mode-tab active" onclick="setMode('basic')">X% of Y</div>
+            <div class="mode-tab" onclick="setMode('whatpct')">What % is X of Y?</div>
+            <div class="mode-tab" onclick="setMode('change')">% Increase / Decrease</div>
+          </div>
+
+          <!-- Mode 1: X% of Y -->
+          <div class="calc-block active" id="block-basic">
+            <div class="control-row">
+              <div class="control-group">
+                <label>Percentage (%)</label>
+                <input type="number" id="b-pct" placeholder="e.g. 20" oninput="calcBasic()" />
+              </div>
+              <div class="control-group">
+                <label>Of value</label>
+                <input type="number" id="b-val" placeholder="e.g. 150" oninput="calcBasic()" />
+              </div>
+            </div>
+            <div class="result-box">
+              <div class="result-label">Result</div>
+              <div class="result-value" id="r-basic">—</div>
+              <div class="result-desc" id="d-basic">Enter values above</div>
+            </div>
+          </div>
+
+          <!-- Mode 2: What % is X of Y -->
+          <div class="calc-block" id="block-whatpct">
+            <div class="control-row">
+              <div class="control-group">
+                <label>Value (X)</label>
+                <input type="number" id="w-x" placeholder="e.g. 30" oninput="calcWhat()" />
+              </div>
+              <div class="control-group">
+                <label>Total (Y)</label>
+                <input type="number" id="w-y" placeholder="e.g. 200" oninput="calcWhat()" />
+              </div>
+            </div>
+            <div class="result-box">
+              <div class="result-label">Result</div>
+              <div class="result-value" id="r-what">—</div>
+              <div class="result-desc" id="d-what">Enter values above</div>
+            </div>
+          </div>
+
+          <!-- Mode 3: % change -->
+          <div class="calc-block" id="block-change">
+            <div class="control-row">
+              <div class="control-group">
+                <label>From value</label>
+                <input type="number" id="c-from" placeholder="e.g. 100" oninput="calcChange()" />
+              </div>
+              <div class="control-group">
+                <label>To value</label>
+                <input type="number" id="c-to" placeholder="e.g. 125" oninput="calcChange()" />
+              </div>
+            </div>
+            <div class="result-box">
+              <div class="result-label">Result</div>
+              <div class="result-value" id="r-change">—</div>
+              <div class="result-desc" id="d-change">Enter values above</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer><div class="container">© 2026 Toolez — free tools for everyone, zero data saved!</div></footer>
+
+  <script>
+    function setMode(mode) {
+      document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.calc-block').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById('block-' + mode).classList.add('active');
+    }
+
+    function calcBasic() {
+      const pct = parseFloat(document.getElementById('b-pct').value);
+      const val = parseFloat(document.getElementById('b-val').value);
+      if (isNaN(pct) || isNaN(val)) { document.getElementById('r-basic').textContent = '—'; document.getElementById('d-basic').textContent = 'Enter values above'; return; }
+      const res = (pct / 100) * val;
+      document.getElementById('r-basic').textContent = parseFloat(res.toFixed(6));
+      document.getElementById('d-basic').textContent = `${pct}% of ${val} = ${parseFloat(res.toFixed(6))}`;
+    }
+
+    function calcWhat() {
+      const x = parseFloat(document.getElementById('w-x').value);
+      const y = parseFloat(document.getElementById('w-y').value);
+      if (isNaN(x) || isNaN(y) || y === 0) { document.getElementById('r-what').textContent = '—'; document.getElementById('d-what').textContent = 'Enter values above'; return; }
+      const res = (x / y) * 100;
+      document.getElementById('r-what').textContent = parseFloat(res.toFixed(4)) + '%';
+      document.getElementById('d-what').textContent = `${x} is ${parseFloat(res.toFixed(4))}% of ${y}`;
+    }
+
+    function calcChange() {
+      const from = parseFloat(document.getElementById('c-from').value);
+      const to = parseFloat(document.getElementById('c-to').value);
+      if (isNaN(from) || isNaN(to) || from === 0) { document.getElementById('r-change').textContent = '—'; document.getElementById('d-change').textContent = 'Enter values above'; return; }
+      const res = ((to - from) / Math.abs(from)) * 100;
+      const sign = res >= 0 ? '+' : '';
+      const type = res >= 0 ? '📈 Increase' : '📉 Decrease';
+      document.getElementById('r-change').textContent = sign + parseFloat(res.toFixed(4)) + '%';
+      document.getElementById('d-change').textContent = `${type}: from ${from} to ${to}`;
+    }
+  </script>
+</body>
+</html>

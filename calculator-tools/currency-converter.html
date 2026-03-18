@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Toolez - Currency Converter</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; line-height: 1.5; min-height: 100vh; display: flex; flex-direction: column; }
+    a { text-decoration: none; color: inherit; }
+    .container { width: min(1200px, 92%); margin: 0 auto; }
+    header { position: sticky; top: 0; z-index: 100; background: rgba(10,10,10,0.95); border-bottom: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(10px); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 0; flex-wrap: wrap; }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-box { width: 42px; height: 42px; border-radius: 14px; background: #fff; color: #111; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
+    .logo-text h1 { font-size: 18px; }
+    .logo-text p { font-size: 12px; color: #aaa; }
+    nav { display: flex; gap: 22px; color: #cfcfcf; font-size: 14px; }
+    nav a:hover { color: #fff; }
+    .breadcrumb { padding: 18px 0 0; display: flex; align-items: center; gap: 8px; font-size: 14px; color: #666; flex-wrap: wrap; }
+    .breadcrumb a { color: #888; transition: color 0.2s; }
+    .breadcrumb a:hover { color: #fff; }
+    .breadcrumb span { color: #444; }
+    .breadcrumb strong { color: #d0d0d0; }
+    .page-title { padding: 16px 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .page-title-left { display: flex; align-items: center; gap: 14px; }
+    .tool-badge { width: 48px; height: 48px; border-radius: 14px; background: rgba(251,113,133,0.15); border: 1px solid rgba(251,113,133,0.25); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .page-title h2 { font-size: 26px; }
+    .page-title p { font-size: 14px; color: #888; margin-top: 3px; }
+    .back-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #cfcfcf; font-size: 14px; transition: 0.2s ease; }
+    .back-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .main { flex: 1; padding-bottom: 50px; }
+    .split-card { border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); border-radius: 28px; overflow: hidden; display: grid; grid-template-columns: 1fr 1px 1fr; min-height: 520px; }
+    .divider { background: rgba(255,255,255,0.07); }
+    .panel-left { padding: 32px 30px; display: flex; flex-direction: column; gap: 24px; }
+    .panel-label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: #555; text-transform: uppercase; margin-bottom: 4px; }
+    .panel-left h3 { font-size: 20px; color: #f0f0f0; }
+    .instructions { display: flex; flex-direction: column; gap: 14px; }
+    .step { display: flex; gap: 14px; align-items: flex-start; }
+    .step-num { width: 28px; height: 28px; border-radius: 9px; background: rgba(251,113,133,0.15); border: 1px solid rgba(251,113,133,0.25); color: #fca5a5; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .step-text strong { display: block; font-size: 14px; color: #e0e0e0; margin-bottom: 3px; }
+    .step-text span { font-size: 13px; color: #777; }
+    .info-box { background: rgba(251,113,133,0.06); border: 1px solid rgba(251,113,133,0.15); border-radius: 16px; padding: 16px 18px; }
+    .info-box p { font-size: 13px; color: #999; line-height: 1.6; }
+    .info-box p strong { color: #fca5a5; }
+    .warn-box { background: rgba(251,191,36,0.06); border: 1px solid rgba(251,191,36,0.2); border-radius: 16px; padding: 14px 16px; }
+    .warn-box p { font-size: 12px; color: #a16207; line-height: 1.6; }
+    .warn-box p strong { color: #fbbf24; }
+    .currency-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .currency-item { font-size: 12px; color: #666; padding: 5px 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.06); }
+    .panel-right { padding: 32px 30px; display: flex; flex-direction: column; gap: 20px; }
+    .panel-right h3 { font-size: 20px; color: #f0f0f0; }
+    .control-group { display: flex; flex-direction: column; gap: 6px; }
+    .control-group label { font-size: 13px; color: #888; }
+    .control-group select { background: #0d0d0d; border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 12px; padding: 11px 14px; font-size: 14px; outline: none; transition: border-color 0.2s; width: 100%; cursor: pointer; }
+    .control-group select option { background: #111; }
+    .control-group input[type="number"] { background: #0d0d0d; border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 12px; padding: 11px 14px; font-size: 14px; outline: none; transition: border-color 0.2s; width: 100%; }
+    .control-group select:focus, .control-group input:focus { border-color: rgba(251,113,133,0.45); }
+    .control-group input::placeholder { color: #444; }
+    .swap-row { display: flex; align-items: flex-end; gap: 12px; }
+    .swap-row .control-group { flex: 1; }
+    .swap-btn { width: 42px; height: 42px; border-radius: 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #aaa; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: 0.2s; margin-bottom: 1px; }
+    .swap-btn:hover { background: rgba(251,113,133,0.15); color: #fca5a5; }
+    .result-box { background: #090909; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 22px 24px; }
+    .result-box .result-label { font-size: 12px; color: #555; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+    .result-main { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+    .result-value { font-size: 38px; font-weight: 700; color: #fca5a5; }
+    .result-currency { font-size: 18px; color: #888; font-weight: 600; }
+    .result-rate { font-size: 13px; color: #555; margin-top: 4px; }
+    .popular-pairs { display: flex; flex-direction: column; gap: 6px; }
+    .pair-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; cursor: pointer; transition: 0.2s; }
+    .pair-row:hover { border-color: rgba(251,113,133,0.25); background: rgba(251,113,133,0.04); }
+    .pair-label { font-size: 13px; color: #aaa; }
+    .pair-rate { font-size: 13px; color: #666; font-family: monospace; }
+    footer { border-top: 1px solid rgba(255,255,255,0.08); color: #888; padding: 22px 0 30px; font-size: 14px; }
+    @media (max-width: 860px) { .split-card { grid-template-columns: 1fr; } .divider { width: 100%; height: 1px; } }
+    @media (max-width: 600px) { .page-title h2 { font-size: 20px; } .panel-left, .panel-right { padding: 22px 18px; } .currency-list { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-box">T</div>
+        <div class="logo-text"><h1>Toolez</h1><p>Everything you need. Nothing to pay.</p></div>
+      </a>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="#">Donate a coffee</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a><span>/</span>
+        <a href="../calculator-tools.html">Calculator Tools</a><span>/</span>
+        <strong>Currency Converter</strong>
+      </div>
+      <div class="page-title">
+        <div class="page-title-left">
+          <div class="tool-badge">💱</div>
+          <div><h2>Currency Converter</h2><p>Convert between 20+ world currencies instantly</p></div>
+        </div>
+        <a href="../calculator-tools.html" class="back-btn">← Back to Calculator Tools</a>
+      </div>
+
+      <div class="split-card">
+        <!-- LEFT -->
+        <div class="panel-left">
+          <div>
+            <div class="panel-label">How it works</div>
+            <h3>Instructions</h3>
+          </div>
+          <div class="instructions">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-text"><strong>Enter the amount</strong><span>Type the amount you want to convert in the input field</span></div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-text"><strong>Select currencies</strong><span>Pick the "From" currency and the "To" currency from the dropdowns</span></div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-text"><strong>Read the result</strong><span>The converted amount and exchange rate appear instantly</span></div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div class="step-text"><strong>Use swap button</strong><span>Press ⇄ to quickly flip the conversion direction</span></div>
+            </div>
+          </div>
+          <div class="warn-box">
+            <p><strong>⚠️ Reference rates only.</strong> Exchange rates are static estimates for reference. For financial decisions, always check a live source like your bank or a financial platform.</p>
+          </div>
+          <div>
+            <div class="panel-label" style="margin-bottom:10px;">Supported currencies</div>
+            <div class="currency-list">
+              <div class="currency-item">🇺🇸 USD</div><div class="currency-item">🇪🇺 EUR</div>
+              <div class="currency-item">🇬🇧 GBP</div><div class="currency-item">🇯🇵 JPY</div>
+              <div class="currency-item">🇨🇳 CNY</div><div class="currency-item">🇨🇦 CAD</div>
+              <div class="currency-item">🇦🇺 AUD</div><div class="currency-item">🇨🇭 CHF</div>
+              <div class="currency-item">🇮🇳 INR</div><div class="currency-item">🇧🇷 BRL</div>
+              <div class="currency-item">🇲🇽 MXN</div><div class="currency-item">🇷🇴 RON</div>
+              <div class="currency-item">🇸🇬 SGD</div><div class="currency-item">🇰🇷 KRW</div>
+              <div class="currency-item">🇸🇦 SAR</div><div class="currency-item">🇦🇪 AED</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- RIGHT -->
+        <div class="panel-right">
+          <div>
+            <div class="panel-label">Tool</div>
+            <h3>Currency Converter</h3>
+          </div>
+
+          <div class="control-group">
+            <label>Amount</label>
+            <input type="number" id="amount" placeholder="e.g. 100" oninput="convert()" value="1" min="0" />
+          </div>
+
+          <div class="swap-row">
+            <div class="control-group">
+              <label>From</label>
+              <select id="fromCur" onchange="convert()"></select>
+            </div>
+            <button class="swap-btn" onclick="swapCurrencies()" title="Swap">⇄</button>
+            <div class="control-group">
+              <label>To</label>
+              <select id="toCur" onchange="convert()"></select>
+            </div>
+          </div>
+
+          <div class="result-box">
+            <div class="result-label">Converted amount</div>
+            <div class="result-main">
+              <div class="result-value" id="resultVal">—</div>
+              <div class="result-currency" id="resultCur"></div>
+            </div>
+            <div class="result-rate" id="resultRate">Select currencies and enter an amount</div>
+          </div>
+
+          <div>
+            <div class="panel-label" style="margin-bottom:10px;">Quick pairs — click to load</div>
+            <div class="popular-pairs">
+              <div class="pair-row" onclick="loadPair('USD','EUR')"><span class="pair-label">🇺🇸 USD → 🇪🇺 EUR</span><span class="pair-rate" id="q-usd-eur">—</span></div>
+              <div class="pair-row" onclick="loadPair('EUR','RON')"><span class="pair-label">🇪🇺 EUR → 🇷🇴 RON</span><span class="pair-rate" id="q-eur-ron">—</span></div>
+              <div class="pair-row" onclick="loadPair('USD','GBP')"><span class="pair-label">🇺🇸 USD → 🇬🇧 GBP</span><span class="pair-rate" id="q-usd-gbp">—</span></div>
+              <div class="pair-row" onclick="loadPair('GBP','JPY')"><span class="pair-label">🇬🇧 GBP → 🇯🇵 JPY</span><span class="pair-rate" id="q-gbp-jpy">—</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer><div class="container">© 2026 Toolez — free tools for everyone, zero data saved!</div></footer>
+
+  <script>
+    // Static reference rates relative to USD (approximate, March 2026)
+    const rates = {
+      USD: 1, EUR: 0.924, GBP: 0.788, JPY: 149.5, CNY: 7.24, CAD: 1.357,
+      AUD: 1.533, CHF: 0.899, INR: 83.1, BRL: 4.97, MXN: 17.15, RON: 4.60,
+      SGD: 1.344, KRW: 1325, SAR: 3.75, AED: 3.673
+    };
+    const flags = {
+      USD:'🇺🇸', EUR:'🇪🇺', GBP:'🇬🇧', JPY:'🇯🇵', CNY:'🇨🇳', CAD:'🇨🇦',
+      AUD:'🇦🇺', CHF:'🇨🇭', INR:'🇮🇳', BRL:'🇧🇷', MXN:'🇲🇽', RON:'🇷🇴',
+      SGD:'🇸🇬', KRW:'🇰🇷', SAR:'🇸🇦', AED:'🇦🇪'
+    };
+
+    function buildSelects() {
+      const from = document.getElementById('fromCur');
+      const to = document.getElementById('toCur');
+      Object.keys(rates).forEach(c => {
+        from.innerHTML += `<option value="${c}">${flags[c]} ${c}</option>`;
+        to.innerHTML += `<option value="${c}">${flags[c]} ${c}</option>`;
+      });
+      from.value = 'USD';
+      to.value = 'EUR';
+
+      // Quick pair rates
+      document.getElementById('q-usd-eur').textContent = '1 USD = ' + rates['EUR'].toFixed(4) + ' EUR';
+      document.getElementById('q-eur-ron').textContent = '1 EUR = ' + (rates['RON']/rates['EUR']).toFixed(4) + ' RON';
+      document.getElementById('q-usd-gbp').textContent = '1 USD = ' + rates['GBP'].toFixed(4) + ' GBP';
+      document.getElementById('q-gbp-jpy').textContent = '1 GBP = ' + (rates['JPY']/rates['GBP']).toFixed(2) + ' JPY';
+
+      convert();
+    }
+
+    function convert() {
+      const amt = parseFloat(document.getElementById('amount').value);
+      const from = document.getElementById('fromCur').value;
+      const to = document.getElementById('toCur').value;
+      if (isNaN(amt) || amt < 0) {
+        document.getElementById('resultVal').textContent = '—';
+        document.getElementById('resultCur').textContent = '';
+        document.getElementById('resultRate').textContent = 'Enter a valid amount';
+        return;
+      }
+      const usd = amt / rates[from];
+      const result = usd * rates[to];
+      const rate = rates[to] / rates[from];
+      document.getElementById('resultVal').textContent = result.toLocaleString('en-US', { maximumFractionDigits: 4 });
+      document.getElementById('resultCur').textContent = to;
+      document.getElementById('resultRate').textContent = `1 ${from} = ${rate.toFixed(6)} ${to}  •  reference rate`;
+    }
+
+    function swapCurrencies() {
+      const from = document.getElementById('fromCur');
+      const to = document.getElementById('toCur');
+      const tmp = from.value;
+      from.value = to.value;
+      to.value = tmp;
+      convert();
+    }
+
+    function loadPair(from, to) {
+      document.getElementById('fromCur').value = from;
+      document.getElementById('toCur').value = to;
+      convert();
+    }
+
+    buildSelects();
+  </script>
+</body>
+</html>

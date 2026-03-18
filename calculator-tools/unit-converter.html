@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Toolez - Unit Converter</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; line-height: 1.5; min-height: 100vh; display: flex; flex-direction: column; }
+    a { text-decoration: none; color: inherit; }
+    .container { width: min(1200px, 92%); margin: 0 auto; }
+    header { position: sticky; top: 0; z-index: 100; background: rgba(10,10,10,0.95); border-bottom: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(10px); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 0; flex-wrap: wrap; }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-box { width: 42px; height: 42px; border-radius: 14px; background: #fff; color: #111; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
+    .logo-text h1 { font-size: 18px; }
+    .logo-text p { font-size: 12px; color: #aaa; }
+    nav { display: flex; gap: 22px; color: #cfcfcf; font-size: 14px; }
+    nav a:hover { color: #fff; }
+    .breadcrumb { padding: 18px 0 0; display: flex; align-items: center; gap: 8px; font-size: 14px; color: #666; flex-wrap: wrap; }
+    .breadcrumb a { color: #888; transition: color 0.2s; }
+    .breadcrumb a:hover { color: #fff; }
+    .breadcrumb span { color: #444; }
+    .breadcrumb strong { color: #d0d0d0; }
+    .page-title { padding: 16px 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .page-title-left { display: flex; align-items: center; gap: 14px; }
+    .tool-badge { width: 48px; height: 48px; border-radius: 14px; background: rgba(251,113,133,0.15); border: 1px solid rgba(251,113,133,0.25); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .page-title h2 { font-size: 26px; }
+    .page-title p { font-size: 14px; color: #888; margin-top: 3px; }
+    .back-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #cfcfcf; font-size: 14px; transition: 0.2s ease; }
+    .back-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .main { flex: 1; padding-bottom: 50px; }
+    .split-card { border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); border-radius: 28px; overflow: hidden; display: grid; grid-template-columns: 1fr 1px 1fr; min-height: 520px; }
+    .divider { background: rgba(255,255,255,0.07); }
+    .panel-left { padding: 32px 30px; display: flex; flex-direction: column; gap: 24px; }
+    .panel-label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: #555; text-transform: uppercase; margin-bottom: 4px; }
+    .panel-left h3 { font-size: 20px; color: #f0f0f0; }
+    .instructions { display: flex; flex-direction: column; gap: 14px; }
+    .step { display: flex; gap: 14px; align-items: flex-start; }
+    .step-num { width: 28px; height: 28px; border-radius: 9px; background: rgba(251,113,133,0.15); border: 1px solid rgba(251,113,133,0.25); color: #fca5a5; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .step-text strong { display: block; font-size: 14px; color: #e0e0e0; margin-bottom: 3px; }
+    .step-text span { font-size: 13px; color: #777; }
+    .info-box { background: rgba(251,113,133,0.06); border: 1px solid rgba(251,113,133,0.15); border-radius: 16px; padding: 16px 18px; }
+    .info-box p { font-size: 13px; color: #999; line-height: 1.6; }
+    .info-box p strong { color: #fca5a5; }
+    .category-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .cat-tag { padding: 5px 12px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); font-size: 12px; color: #aaa; }
+    .panel-right { padding: 32px 30px; display: flex; flex-direction: column; gap: 20px; }
+    .panel-right h3 { font-size: 20px; color: #f0f0f0; }
+    .control-group { display: flex; flex-direction: column; gap: 6px; }
+    .control-group label { font-size: 13px; color: #888; }
+    .control-group select,
+    .control-group input[type="number"],
+    .control-group input[type="text"] { background: #0d0d0d; border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 12px; padding: 11px 14px; font-size: 14px; outline: none; transition: border-color 0.2s; width: 100%; }
+    .control-group select { cursor: pointer; }
+    .control-group select option { background: #111; }
+    .control-group select:focus,
+    .control-group input:focus { border-color: rgba(251,113,133,0.45); }
+    .control-group input::placeholder { color: #444; }
+    .control-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .swap-row { display: flex; align-items: center; gap: 12px; }
+    .swap-row .control-group { flex: 1; }
+    .swap-btn { width: 38px; height: 38px; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #aaa; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 20px; transition: background 0.2s, color 0.2s; }
+    .swap-btn:hover { background: rgba(251,113,133,0.15); color: #fca5a5; }
+    .result-box { background: #090909; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px 22px; }
+    .result-box .result-label { font-size: 12px; color: #555; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+    .result-box .result-value { font-size: 32px; font-weight: 700; color: #fca5a5; word-break: break-all; }
+    .result-box .result-unit { font-size: 14px; color: #666; margin-top: 4px; }
+    .btn-primary { width: 100%; padding: 14px; border-radius: 16px; background: rgba(251,113,133,0.85); color: #fff; border: none; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s ease, transform 0.15s ease; letter-spacing: 0.02em; }
+    .btn-primary:hover { background: rgba(251,113,133,1); transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+    footer { border-top: 1px solid rgba(255,255,255,0.08); color: #888; padding: 22px 0 30px; font-size: 14px; }
+    @media (max-width: 860px) { .split-card { grid-template-columns: 1fr; } .divider { width: 100%; height: 1px; } }
+    @media (max-width: 600px) { .page-title h2 { font-size: 20px; } .control-row { grid-template-columns: 1fr; } .panel-left, .panel-right { padding: 22px 18px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-box">T</div>
+        <div class="logo-text"><h1>Toolez</h1><p>Everything you need. Nothing to pay.</p></div>
+      </a>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="#">Donate a coffee</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a><span>/</span>
+        <a href="../calculator-tools.html">Calculator Tools</a><span>/</span>
+        <strong>Unit Converter</strong>
+      </div>
+      <div class="page-title">
+        <div class="page-title-left">
+          <div class="tool-badge">📏</div>
+          <div><h2>Unit Converter</h2><p>Convert between length, weight, temperature, speed and more</p></div>
+        </div>
+        <a href="../calculator-tools.html" class="back-btn">← Back to Calculator Tools</a>
+      </div>
+
+      <div class="split-card">
+        <!-- LEFT -->
+        <div class="panel-left">
+          <div>
+            <div class="panel-label">How it works</div>
+            <h3>Instructions</h3>
+          </div>
+          <div class="instructions">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-text"><strong>Choose a category</strong><span>Select the type of unit you want to convert: length, weight, temperature, speed, etc.</span></div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-text"><strong>Select units</strong><span>Pick the "From" unit and the "To" unit from the dropdowns</span></div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-text"><strong>Enter your value</strong><span>Type the number you want to convert in the input field</span></div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div class="step-text"><strong>Read the result</strong><span>The converted value is shown instantly below — no button needed</span></div>
+            </div>
+          </div>
+          <div class="info-box">
+            <p><strong>Instant conversion.</strong> Results update in real time as you type. No data is sent anywhere.</p>
+          </div>
+          <div>
+            <div class="panel-label" style="margin-bottom:10px;">Available categories</div>
+            <div class="category-tags">
+              <span class="cat-tag">📏 Length</span>
+              <span class="cat-tag">⚖️ Weight</span>
+              <span class="cat-tag">🌡️ Temperature</span>
+              <span class="cat-tag">🏃 Speed</span>
+              <span class="cat-tag">📐 Area</span>
+              <span class="cat-tag">📦 Volume</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- RIGHT -->
+        <div class="panel-right">
+          <div>
+            <div class="panel-label">Tool</div>
+            <h3>Unit Converter</h3>
+          </div>
+
+          <div class="control-group">
+            <label>Category</label>
+            <select id="category" onchange="updateUnits()">
+              <option value="length">📏 Length</option>
+              <option value="weight">⚖️ Weight</option>
+              <option value="temperature">🌡️ Temperature</option>
+              <option value="speed">🏃 Speed</option>
+              <option value="area">📐 Area</option>
+              <option value="volume">📦 Volume</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label>Value to convert</label>
+            <input type="number" id="inputValue" placeholder="Enter a number..." oninput="convert()" />
+          </div>
+
+          <div class="swap-row">
+            <div class="control-group">
+              <label>From</label>
+              <select id="fromUnit" onchange="convert()"></select>
+            </div>
+            <button class="swap-btn" onclick="swapUnits()" title="Swap units">⇄</button>
+            <div class="control-group">
+              <label>To</label>
+              <select id="toUnit" onchange="convert()"></select>
+            </div>
+          </div>
+
+          <div class="result-box">
+            <div class="result-label">Result</div>
+            <div class="result-value" id="resultValue">—</div>
+            <div class="result-unit" id="resultUnit">Enter a value above to see the conversion</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer><div class="container">© 2026 Toolez — free tools for everyone, zero data saved!</div></footer>
+
+  <script>
+    const units = {
+      length: {
+        units: ['Meter (m)', 'Kilometer (km)', 'Centimeter (cm)', 'Millimeter (mm)', 'Mile (mi)', 'Yard (yd)', 'Foot (ft)', 'Inch (in)'],
+        keys: ['m','km','cm','mm','mi','yd','ft','in'],
+        toBase: { m:1, km:1000, cm:0.01, mm:0.001, mi:1609.344, yd:0.9144, ft:0.3048, in:0.0254 }
+      },
+      weight: {
+        units: ['Kilogram (kg)', 'Gram (g)', 'Milligram (mg)', 'Pound (lb)', 'Ounce (oz)', 'Tonne (t)'],
+        keys: ['kg','g','mg','lb','oz','t'],
+        toBase: { kg:1, g:0.001, mg:0.000001, lb:0.453592, oz:0.0283495, t:1000 }
+      },
+      temperature: {
+        units: ['Celsius (°C)', 'Fahrenheit (°F)', 'Kelvin (K)'],
+        keys: ['c','f','k'],
+        toBase: null
+      },
+      speed: {
+        units: ['m/s', 'km/h', 'mph', 'knot', 'ft/s'],
+        keys: ['ms','kmh','mph','kt','fts'],
+        toBase: { ms:1, kmh:0.277778, mph:0.44704, kt:0.514444, fts:0.3048 }
+      },
+      area: {
+        units: ['Square meter (m²)', 'Square km (km²)', 'Square cm (cm²)', 'Hectare (ha)', 'Acre', 'Square foot (ft²)', 'Square inch (in²)'],
+        keys: ['m2','km2','cm2','ha','ac','ft2','in2'],
+        toBase: { m2:1, km2:1e6, cm2:0.0001, ha:10000, ac:4046.86, ft2:0.092903, in2:0.00064516 }
+      },
+      volume: {
+        units: ['Liter (L)', 'Milliliter (mL)', 'Cubic meter (m³)', 'Gallon (US)', 'Pint (US)', 'Cup (US)', 'Fluid ounce (fl oz)'],
+        keys: ['l','ml','m3','gal','pt','cup','floz'],
+        toBase: { l:1, ml:0.001, m3:1000, gal:3.78541, pt:0.473176, cup:0.236588, floz:0.0295735 }
+      }
+    };
+
+    function updateUnits() {
+      const cat = document.getElementById('category').value;
+      const data = units[cat];
+      const from = document.getElementById('fromUnit');
+      const to = document.getElementById('toUnit');
+      from.innerHTML = '';
+      to.innerHTML = '';
+      data.units.forEach((u, i) => {
+        from.innerHTML += `<option value="${data.keys[i]}">${u}</option>`;
+        to.innerHTML += `<option value="${data.keys[i]}">${u}</option>`;
+      });
+      to.selectedIndex = 1;
+      convert();
+    }
+
+    function convertTemp(val, from, to) {
+      let celsius;
+      if (from === 'c') celsius = val;
+      else if (from === 'f') celsius = (val - 32) * 5/9;
+      else celsius = val - 273.15;
+      if (to === 'c') return celsius;
+      if (to === 'f') return celsius * 9/5 + 32;
+      return celsius + 273.15;
+    }
+
+    function convert() {
+      const val = parseFloat(document.getElementById('inputValue').value);
+      const cat = document.getElementById('category').value;
+      const from = document.getElementById('fromUnit').value;
+      const to = document.getElementById('toUnit').value;
+      const data = units[cat];
+      const fromLabel = data.units[data.keys.indexOf(from)];
+      const toLabel = data.units[data.keys.indexOf(to)];
+
+      if (isNaN(val)) {
+        document.getElementById('resultValue').textContent = '—';
+        document.getElementById('resultUnit').textContent = 'Enter a value above to see the conversion';
+        return;
+      }
+
+      let result;
+      if (cat === 'temperature') {
+        result = convertTemp(val, from, to);
+      } else {
+        const base = val * data.toBase[from];
+        result = base / data.toBase[to];
+      }
+
+      const formatted = parseFloat(result.toPrecision(8)).toString();
+      document.getElementById('resultValue').textContent = formatted;
+      document.getElementById('resultUnit').textContent = `${val} ${fromLabel} = ${formatted} ${toLabel}`;
+    }
+
+    function swapUnits() {
+      const from = document.getElementById('fromUnit');
+      const to = document.getElementById('toUnit');
+      const tmp = from.value;
+      from.value = to.value;
+      to.value = tmp;
+      convert();
+    }
+
+    updateUnits();
+  </script>
+</body>
+</html>

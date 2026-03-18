@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Toolez - Calculator Tools</title>
+  <title>Toolez - Image Tools</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; line-height: 1.5; }
@@ -25,8 +25,8 @@
     .back-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
     .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
     .tool-btn { display: flex; align-items: center; gap: 12px; padding: 16px 18px; font-size: 15px; color: #d0d0d0; border-radius: 16px; background: #0d0d0d; border: 1px solid rgba(255,255,255,0.08); cursor: pointer; transition: transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94), background 0.25s ease, border-color 0.25s ease, color 0.25s ease; }
-    .tool-btn:hover { transform: scale(1.03); background: rgba(251,113,133,0.1); border-color: rgba(251,113,133,0.3); color: #fff; }
-    .tool-btn .tool-icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(251,113,133,0.12); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .tool-btn:hover { transform: scale(1.03); background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.3); color: #fff; }
+    .tool-btn .tool-icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(251,191,36,0.12); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
     .tool-btn span { font-weight: 500; }
     footer { border-top: 1px solid rgba(255,255,255,0.08); color: #888; padding: 22px 0 34px; font-size: 14px; margin-top: 40px; }
     @media (max-width: 1024px) { .tools-grid { grid-template-columns: repeat(2, 1fr); } nav { display: none; } }
@@ -36,12 +36,12 @@
 <body>
   <header>
     <div class="container header-inner">
-      <a href="Toolez_-_Copy.html" class="logo">
+      <a href="index.html" class="logo">
         <div class="logo-box">T</div>
         <div class="logo-text"><h1>Toolez</h1><p>Everything you need. Nothing to pay.</p></div>
       </a>
       <nav>
-        <a href="Toolez_-_Copy.html">Home</a>
+        <a href="index.html">Home</a>
         <a href="#">Donate a coffee</a>
       </nav>
     </div>
@@ -51,28 +51,28 @@
     <div class="container">
       <div class="section-card">
         <div class="section-top">
-          <h3>🧮 Calculator Tools</h3>
-          <a href="Toolez_-_Copy.html" class="back-btn">← Back</a>
+          <h3>🖼️ Image Tools</h3>
+          <a href="index.html" class="back-btn">← Back</a>
         </div>
         <div class="tools-grid">
-          <a href="#" class="tool-btn"><div class="tool-icon">📏</div><span>Unit Converter</span></a>
-          <a href="#" class="tool-btn"><div class="tool-icon">💯</div><span>Percentage Calculator</span></a>
-          <a href="#" class="tool-btn"><div class="tool-icon">📅</div><span>Date Difference Calculator</span></a>
-          <a href="#" class="tool-btn"><div class="tool-icon">💱</div><span>Currency Converter</span></a>
-          <a href="#" class="tool-btn"><div class="tool-icon">⏱️</div><span>Time Zone Converter</span></a>
-          <a href="#" class="tool-btn"><div class="tool-icon">🔢</div><span>Number Base Converter</span></a>
-          <a href="#" class="tool-btn"><div class="tool-icon">📐</div><span>Area Calculator</span></a>
-          <a href="#" class="tool-btn"><div class="tool-icon">⚖️</div><span>Weight / Mass Converter</span></a>
-          <a href="#" class="tool-btn"><div class="tool-icon">🌡️</div><span>Temperature Converter</span></a>
-          <a href="#" class="tool-btn"><div class="tool-icon">🏃</div><span>Speed Converter</span></a>
-          <a href="#" class="tool-btn"><div class="tool-icon">💾</div><span>Data Storage Converter</span></a>
-          <a href="#" class="tool-btn"><div class="tool-icon">📈</div><span>Tip Calculator</span></a>
-          <a href="#" class="tool-btn"><div class="tool-icon">🏦</div><span>Loan / Interest Calculator</span></a>
-          <a href="#" class="tool-btn"><div class="tool-icon">🔋</div><span>Energy Converter</span></a>
-          <a href="#" class="tool-btn"><div class="tool-icon">📦</div><span>Volume Calculator</span></a>
-          <a href="#" class="tool-btn"><div class="tool-icon">🎂</div><span>Age Calculator</span></a>
-          <a href="#" class="tool-btn"><div class="tool-icon">🧠</div><span>BMI Calculator</span></a>
-          <a href="#" class="tool-btn"><div class="tool-icon">💡</div><span>Power / Watts Converter</span></a>
+          <a href="#" class="tool-btn"><div class="tool-icon">📐</div><span>Resize Image</span></a>
+          <a href="#" class="tool-btn"><div class="tool-icon">✂️</div><span>Crop Image</span></a>
+          <a href="#" class="tool-btn"><div class="tool-icon">📦</div><span>Compress Image</span></a>
+          <a href="#" class="tool-btn"><div class="tool-icon">🔁</div><span>Convert PNG / JPG / WebP</span></a>
+          <a href="#" class="tool-btn"><div class="tool-icon">🔄</div><span>Rotate / Flip Image</span></a>
+          <a href="#" class="tool-btn"><div class="tool-icon">🎨</div><span>Add Watermark</span></a>
+          <a href="#" class="tool-btn"><div class="tool-icon">🪄</div><span>Remove Background</span></a>
+          <a href="#" class="tool-btn"><div class="tool-icon">⬛</div><span>Image to Grayscale</span></a>
+          <a href="#" class="tool-btn"><div class="tool-icon">🔗</div><span>Merge / Collage</span></a>
+          <a href="#" class="tool-btn"><div class="tool-icon">🌊</div><span>Blur Image</span></a>
+          <a href="#" class="tool-btn"><div class="tool-icon">☀️</div><span>Brightness / Contrast</span></a>
+          <a href="#" class="tool-btn"><div class="tool-icon">🖼️</div><span>Add Border / Frame</span></a>
+          <a href="#" class="tool-btn"><div class="tool-icon">📝</div><span>Add Text to Image</span></a>
+          <a href="#" class="tool-btn"><div class="tool-icon">🔍</div><span>Image Metadata Viewer</span></a>
+          <a href="#" class="tool-btn"><div class="tool-icon">📸</div><span>Screenshot to PDF</span></a>
+          <a href="#" class="tool-btn"><div class="tool-icon">🎞️</div><span>Images to GIF</span></a>
+          <a href="#" class="tool-btn"><div class="tool-icon">🔲</div><span>Pixelate / Mosaic</span></a>
+          <a href="#" class="tool-btn"><div class="tool-icon">🌈</div><span>Color Filters</span></a>
         </div>
       </div>
     </div>
